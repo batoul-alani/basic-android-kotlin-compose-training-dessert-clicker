@@ -53,6 +53,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -176,10 +177,11 @@ private fun shareSoldDessertsInformation(intentContext: Context, dessertsSold: I
 
 @Composable
 private fun DessertClickerApp(
-    desserts: List<Dessert>
+    desserts: List<Dessert>,
+    desertViewModel: DesertViewModel = DesertViewModel()
 ) {
+    val desertUiState by desertViewModel.uiState.collectAsState()
 
-    var revenue by rememberSaveable { mutableStateOf(0) }
     var dessertsSold by rememberSaveable { mutableStateOf(0) }
 
     val currentDessertIndex by rememberSaveable { mutableStateOf(0) }
@@ -200,7 +202,7 @@ private fun DessertClickerApp(
                     shareSoldDessertsInformation(
                         intentContext = intentContext,
                         dessertsSold = dessertsSold,
-                        revenue = revenue
+                        revenue = desertUiState.revenue
                     )
                 },
                 modifier = Modifier
@@ -216,13 +218,14 @@ private fun DessertClickerApp(
         }
     ) { contentPadding ->
         DessertClickerScreen(
-            revenue = revenue,
+            revenue = desertUiState.revenue,
             dessertsSold = dessertsSold,
             dessertImageId = currentDessertImageId,
             onDessertClicked = {
 
                 // Update the revenue
-                revenue += currentDessertPrice
+                desertViewModel.changeRevenueValue(revenue = desertUiState.revenue + currentDessertPrice)
+
                 dessertsSold++
 
                 // Show the next dessert
