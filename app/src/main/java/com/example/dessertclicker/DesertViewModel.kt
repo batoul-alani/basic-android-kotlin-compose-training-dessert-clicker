@@ -23,6 +23,14 @@ class DesertViewModel : ViewModel() {
         }
     }
 
+    fun initializeCurrentDessertPrice(currentDessertPrice: Int){
+        _desertUiState.value = DesertUiState(currentDessertPrice= currentDessertPrice)
+    }
+    fun initializeCurrentDessertImageId(currentDessertImageId: Int){
+        _desertUiState.value = DesertUiState(currentDessertImageId= currentDessertImageId)
+    }
+
+
     fun changeCurrentDessertIndex (currentDessertIndex: Int){
         _desertUiState.update {
                 currentState -> currentState.copy(currentDessertIndex = currentDessertIndex)

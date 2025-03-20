@@ -181,17 +181,11 @@ private fun DessertClickerApp(
     desertViewModel: DesertViewModel = DesertViewModel()
 ) {
     val desertUiState by desertViewModel.uiState.collectAsState()
+//
+//    val currentDessertIndex by rememberSaveable { mutableStateOf(0) }
 
-    var dessertsSold by rememberSaveable { mutableStateOf(0) }
-
-    val currentDessertIndex by rememberSaveable { mutableStateOf(0) }
-
-    var currentDessertPrice by rememberSaveable {
-        mutableStateOf(desserts[currentDessertIndex].price)
-    }
-    var currentDessertImageId by rememberSaveable {
-        mutableStateOf(desserts[currentDessertIndex].imageId)
-    }
+    desertViewModel.initializeCurrentDessertPrice(currentDessertPrice = desserts[desertUiState.currentDessertIndex].price)
+    desertViewModel.initializeCurrentDessertImageId(currentDessertImageId = desserts[desertUiState.currentDessertIndex].imageId)
 
     Scaffold(
         topBar = {
@@ -201,7 +195,7 @@ private fun DessertClickerApp(
                 onShareButtonClicked = {
                     shareSoldDessertsInformation(
                         intentContext = intentContext,
-                        dessertsSold = dessertsSold,
+                        dessertsSold = desertUiState.dessertsSold,
                         revenue = desertUiState.revenue
                     )
                 },
@@ -219,19 +213,20 @@ private fun DessertClickerApp(
     ) { contentPadding ->
         DessertClickerScreen(
             revenue = desertUiState.revenue,
-            dessertsSold = dessertsSold,
-            dessertImageId = currentDessertImageId,
+            dessertsSold = desertUiState.dessertsSold,
+            dessertImageId = desertUiState.currentDessertImageId,
             onDessertClicked = {
 
                 // Update the revenue
-                desertViewModel.changeRevenueValue(revenue = desertUiState.revenue + currentDessertPrice)
+                desertViewModel.changeRevenueValue(revenue = desertUiState.revenue + desertUiState.currentDessertPrice)
 
-                dessertsSold++
+                desertViewModel.changeDessertsSold(dessertsSold = desertUiState.dessertsSold++)
 
                 // Show the next dessert
-                val dessertToShow = determineDessertToShow(desserts, dessertsSold)
-                currentDessertImageId = dessertToShow.imageId
-                currentDessertPrice = dessertToShow.price
+                val dessertToShow = determineDessertToShow(desserts, desertUiState.dessertsSold)
+                desertViewModel.changeCurrentDessertImageId(id = dessertToShow.imageId)
+                desertViewModel.changeCurrentDessertPrice(price = dessertToShow.price)
+
             },
             modifier = Modifier.padding(contentPadding)
         )
